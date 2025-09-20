@@ -1,0 +1,36 @@
+services:
+  gh-action-runner:
+    hostname: github-runner
+    image: ghcr.io/actions/actions-runner:latest
+    environment:
+      TOKEN: <AUTH-TOKEN> # Repo => Settings => Actions => Runners => New Self-Hosted Runner
+      URL: https://github.com/runeron/demo # Replace w/your repo
+      RUNNER_NAME: local-compose
+      RUNNER_LABELS: docker,local # `self-hosted` is added automagically
+    volumes:
+      -
+        type: bind
+        source: ./entrypoint.sh
+        target: /entrypoint.sh
+      -
+        type: bind 
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: false
+      -
+        type: bind 
+        source: /tmp
+        target: /tmp
+        read_only: false
+      -
+        type: bind
+        source: /var/lib/docker/containers
+        target: /var/lib/docker/containers
+        read_only: true
+      #-
+      #  type: bind
+      #  source: .docker/config.json
+      #  target: /root/.docker/config.json
+      #  read_only: true
+    entrypoint: /entrypoint.sh
+    command: ./run.sh
